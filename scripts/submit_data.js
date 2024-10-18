@@ -1,36 +1,29 @@
 const fs = require('fs');
 const Crowdsensing = artifacts.require("Crowdsensing");
-const { exec } = require('child_process');
 
 module.exports = async function (callback) {
   try {
     const crowdsensing = await Crowdsensing.deployed();
     const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
 
-    // Read data from the file
-    const data = fs.readFileSync('./data/data.txt', 'utf8').split('\n');
+    console.log("Submitting encrypted data...");
 
-    for (let i = 0; i < data.length; i++) {
-      const plaintextData = data[i].trim();
-      if (plaintextData) {
-        // Call the Python encryption script with the plaintext data
-        exec(`python3 ./privacy/paillier_encryption.py ${plaintextData}`, async (err, stdout, stderr) => {
-          if (err) {
-            console.error(`Error executing Python script: ${err.message}`);
-            return;
-          }
+    // Simulate different encrypted data for each participant
+    const dataSamples = ["Temperature:25", "Humidity:40", "CO2:300"];
 
-          const encryptedData = stdout.trim();  // Capture the encrypted data
+    for (let i = 0; i < dataSamples.length; i++) {
+      const encryptedData = encryptData(dataSamples[i]);
+      await crowdsensing.submitData(encryptedData, { from: accounts[i] });
 
-          // Submit encrypted data to the smart contract
-          await crowdsensing.submitData(encryptedData, { from: account });
-          console.log(`Data submitted successfully from ${account}: ${plaintextData}`);
-        });
-      }
+      console.log(`Data submitted from ${accounts[i]}: ${dataSamples[i]}`);
     }
   } catch (error) {
     console.error("Error submitting data:", error);
   }
   callback();
 };
+
+// Dummy encryption function
+function encryptData(data) {
+  return "0x" + Buffer.from(data).toString('hex');
+}

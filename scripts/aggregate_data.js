@@ -1,29 +1,25 @@
 const Crowdsensing = artifacts.require("Crowdsensing");
 
-module.exports = async function(callback) {
-    const paillier = require('paillier-encryption-lib');
-    const { exec } = require('child_process');
+module.exports = async function (callback) {
+  try {
+    const crowdsensing = await Crowdsensing.deployed();
+    const accounts = await web3.eth.getAccounts();
 
-    try {
-        const crowdsensing = await Crowdsensing.deployed();
-        const accounts = await web3.eth.getAccounts();
+    console.log("Using owner account:", accounts[0]);
 
-        // Aggregate encrypted data (from the blockchain)
-        const encryptedSum = await crowdsensing.getEncryptedSum();  // Assuming contract has this function
+    // Pass the array of provider addresses
+    const providerAddresses = [
+      accounts[0],
+      accounts[1],
+      accounts[2]
+    ];
 
-        // Decrypt aggregated sum using Python script
-        exec(`python3 ./privacy/paillier_encryption.py ${encryptedSum}`, (err, stdout, stderr) => {
-            if (err) {
-                console.error(`Error executing Python script: ${err}`);
-                return;
-            }
-            const decryptedSum = stdout.trim();  // Get the decrypted data from Python script
+    await crowdsensing.aggregateEncryptedData(providerAddresses, { from: accounts[0] });
 
-            console.log(`Decrypted aggregated sum: ${decryptedSum}`);
-            callback();
-        });
-    } catch (error) {
-        console.error("Error aggregating data:", error);
-        callback(error);
-    }
+    const aggregatedSum = await crowdsensing.getEncryptedSum();
+    console.log("Aggregated Encrypted Sum:", aggregatedSum);
+  } catch (error) {
+    console.error("Error aggregating data:", error);
+  }
+  callback();
 };
