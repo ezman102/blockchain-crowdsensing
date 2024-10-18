@@ -1,13 +1,14 @@
 from phe import paillier
+import sys
 
-# Generate Paillier keys
-def generate_keys():
-    return paillier.generate_paillier_keypair()
+# Generate Paillier keys (normally, these would be pre-generated and securely stored)
+public_key, private_key = paillier.generate_paillier_keypair()
 
-# Encrypt data using the public key
-def encrypt_data(public_key, data):
-    return public_key.encrypt(data)
+# Retrieve the plaintext data from command-line argument
+plaintext_data = int(sys.argv[1])
 
-# Decrypt aggregated data using the private key
-def decrypt_data(private_key, encrypted_data):
-    return private_key.decrypt(encrypted_data)
+# Encrypt the data
+encrypted_data = public_key.encrypt(plaintext_data)
+
+# Output the encrypted data (to be captured by Node.js script)
+print(encrypted_data.ciphertext())

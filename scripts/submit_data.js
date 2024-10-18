@@ -1,34 +1,36 @@
 const fs = require('fs');
 const Crowdsensing = artifacts.require("Crowdsensing");
+const { exec } = require('child_process');
 
 module.exports = async function (callback) {
   try {
     const crowdsensing = await Crowdsensing.deployed();
     const accounts = await web3.eth.getAccounts();
+    const account = accounts[0];
 
-    for (let i = 0; i < accounts.length; i++) {
-      const provider = await crowdsensing.dataProviders(accounts[i]);
-      if (!provider.encryptedData) {
-        const data = fs.readFileSync('./data/data.txt', 'utf8').split('\n');
-        const plaintextData = data[i] ? data[i].trim() : null;
+    // Read data from the file
+    const data = fs.readFileSync('./data/data.txt', 'utf8').split('\n');
 
-        if (plaintextData) {
-          const encryptedData = encryptData(plaintextData); // Placeholder for encryption logic
-          await crowdsensing.submitData(encryptedData, { from: accounts[i] });
-          console.log(`Data submitted successfully from ${accounts[i]}: ${plaintextData}`);
-        }
-      } else {
-        console.log(`Data already submitted for account ${accounts[i]}. Skipping...`);
+    for (let i = 0; i < data.length; i++) {
+      const plaintextData = data[i].trim();
+      if (plaintextData) {
+        // Call the Python encryption script with the plaintext data
+        exec(`python3 ./privacy/paillier_encryption.py ${plaintextData}`, async (err, stdout, stderr) => {
+          if (err) {
+            console.error(`Error executing Python script: ${err.message}`);
+            return;
+          }
+
+          const encryptedData = stdout.trim();  // Capture the encrypted data
+
+          // Submit encrypted data to the smart contract
+          await crowdsensing.submitData(encryptedData, { from: account });
+          console.log(`Data submitted successfully from ${account}: ${plaintextData}`);
+        });
       }
     }
   } catch (error) {
     console.error("Error submitting data:", error);
   }
-
   callback();
 };
-
-// Dummy encryption function
-function encryptData(data) {
-  return "0x" + Buffer.from(data).toString('hex');
-}
