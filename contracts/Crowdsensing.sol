@@ -2,22 +2,18 @@
 pragma solidity ^0.8.0;
 
 contract Crowdsensing {
-    struct DataEntry {
-        string encryptedData;
-        uint256 timestamp; // Store the timestamp of the submission
-    }
-
     struct DataProvider {
         address provider;
-        DataEntry[] submissions; // Store multiple submissions with timestamps
+        string[] encryptedData; 
         bool verified;
     }
 
     address public owner;
     mapping(address => DataProvider) public dataProviders;
     uint public dataCount;
+    string public lastAggregatedSum;  // Store last aggregated sum
 
-    event DataSubmitted(address indexed provider, string encryptedData, uint256 timestamp);
+    event DataSubmitted(address indexed provider, string encryptedData);
     event AggregationComplete(string encryptedSum);
 
     constructor() {
@@ -30,31 +26,26 @@ contract Crowdsensing {
     }
 
     function submitData(string memory encryptedData) public {
-        // If the provider is submitting for the first time, initialize their data
         if (dataProviders[msg.sender].provider == address(0)) {
             dataProviders[msg.sender].provider = msg.sender;
         }
-
-        // Add the new encrypted data with a timestamp
-        dataProviders[msg.sender].submissions.push(
-            DataEntry({encryptedData: encryptedData, timestamp: block.timestamp})
-        );
+        dataProviders[msg.sender].encryptedData.push(encryptedData);
         dataCount++;
-
-        emit DataSubmitted(msg.sender, encryptedData, block.timestamp);
+        emit DataSubmitted(msg.sender, encryptedData);
     }
 
-function aggregateEncryptedData(address[] memory providerAddresses) 
-    public onlyOwner returns (string memory) {
-    require(providerAddresses.length > 0, "No provider addresses provided");
+    function aggregateEncryptedData(
+        address[] memory providerAddresses
+    ) public onlyOwner returns (string memory) {
+        require(providerAddresses.length > 0, "No provider addresses provided");
 
-    string memory encryptedSum;
-
-    try {
+        string memory encryptedSum;
         for (uint i = 0; i < providerAddresses.length; i++) {
             address provider = providerAddresses[i];
-            require(dataProviders[provider].encryptedData.length > 0, "No data submitted");
-
+            require(
+                dataProviders[provider].encryptedData.length > 0,
+                "No data submitted"
+            );
             for (uint j = 0; j < dataProviders[provider].encryptedData.length; j++) {
                 encryptedSum = string(
                     abi.encodePacked(
@@ -64,20 +55,12 @@ function aggregateEncryptedData(address[] memory providerAddresses)
                 );
             }
         }
-    } catch (bytes memory error) {
-        revert(string(abi.encodePacked("Aggregation failed: ", error)));
+        lastAggregatedSum = encryptedSum;
+        emit AggregationComplete(encryptedSum);
+        return encryptedSum;
     }
 
-    emit AggregationComplete(encryptedSum);
-    return encryptedSum;
-}
-
-
-    function getProviderData(address provider) 
-        public 
-        view 
-        returns (DataEntry[] memory) 
-    {
-        return dataProviders[provider].submissions;
+    function getLastAggregatedSum() public view returns (string memory) {
+        return lastAggregatedSum;
     }
 }
