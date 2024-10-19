@@ -30,20 +30,28 @@ contract Crowdsensing {
     }
 
     function submitData(string memory encryptedData) public {
-        require(bytes(dataProviders[msg.sender].encryptedData).length == 0, "Data already submitted");
+        require(
+            bytes(dataProviders[msg.sender].encryptedData).length == 0,
+            "Data already submitted"
+        );
         dataProviders[msg.sender].encryptedData = encryptedData;
         dataCount++;
         emit DataSubmitted(msg.sender, encryptedData);
     }
 
-    // Updated to accept an array of addresses
-    function aggregateEncryptedData(address[] memory providerAddresses) public onlyOwner {
-        for (uint i = 0; i < providerAddresses.length; i++) {
-            address provider = providerAddresses[i];
-            encryptedSum = string(abi.encodePacked(encryptedSum, dataProviders[provider].encryptedData));
-        }
-        emit AggregationComplete(encryptedSum);
+function aggregateEncryptedData(address[] memory providerAddresses) public onlyOwner {
+    require(providerAddresses.length > 0, "No provider addresses provided");
+    
+    for (uint i = 0; i < providerAddresses.length; i++) {
+        address provider = providerAddresses[i];
+        require(bytes(dataProviders[provider].encryptedData).length != 0, "Data not submitted by provider");
+        
+        encryptedSum = string(abi.encodePacked(encryptedSum, dataProviders[provider].encryptedData));
     }
+    
+    emit AggregationComplete(encryptedSum);
+}
+
 
     function getEncryptedSum() public view returns (string memory) {
         return encryptedSum;

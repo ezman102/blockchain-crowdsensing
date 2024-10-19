@@ -1,4 +1,4 @@
-const fs = require('fs');
+const { exec } = require('child_process');
 const Crowdsensing = artifacts.require("Crowdsensing");
 
 module.exports = async function (callback) {
@@ -8,22 +8,27 @@ module.exports = async function (callback) {
 
     console.log("Submitting encrypted data...");
 
-    // Simulate different encrypted data for each participant
-    const dataSamples = ["Temperature:25", "Humidity:40", "CO2:300"];
+    // Example data to be encrypted by Python script
+    const plaintext = 25;
 
-    for (let i = 0; i < dataSamples.length; i++) {
-      const encryptedData = encryptData(dataSamples[i]);
-      await crowdsensing.submitData(encryptedData, { from: accounts[i] });
+    exec(`python3 privacy/paillier_encryption.py ${plaintext}`, async (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing Python script: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Python script error: ${stderr}`);
+        return;
+      }
 
-      console.log(`Data submitted from ${accounts[i]}: ${dataSamples[i]}`);
-    }
+      const encryptedData = stdout.trim();
+      console.log(`Encrypted Data: ${encryptedData}`);
+
+      await crowdsensing.submitData(encryptedData, { from: accounts[0] });
+      console.log(`Data submitted from ${accounts[0]}: ${encryptedData}`);
+    });
   } catch (error) {
     console.error("Error submitting data:", error);
   }
   callback();
 };
-
-// Dummy encryption function
-function encryptData(data) {
-  return "0x" + Buffer.from(data).toString('hex');
-}

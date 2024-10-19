@@ -1,37 +1,44 @@
-const CONTRACT_ADDRESS = "0x001D25ae28Ca80256fEaC951907A40d8Ed377BD3"; // Replace if different
+const CONTRACT_ADDRESS = "0xd7Ba84031cf1A2d252c84b858dA2955e0219d39F"; // Replace with actual contract address
 let contract;
 let accounts;
 
-// Connect to the blockchain
 window.addEventListener('load', async () => {
-  if (window.ethereum) {
-    const web3 = new Web3(window.ethereum);
-    await ethereum.request({ method: 'eth_requestAccounts' });
-    accounts = await web3.eth.getAccounts();
+    if (window.ethereum) {
+      const web3 = new Web3(window.ethereum);
+      await ethereum.request({ method: 'eth_requestAccounts' });
+      accounts = await web3.eth.getAccounts();
+  
+      document.getElementById('account').innerText = accounts[0];
+      console.log("Connected account:", accounts[0]);
+  
+      const response = await fetch('Crowdsensing.json');
+      const contractData = await response.json();
+      const abi = contractData.abi;
+  
+      contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
+      console.log("Contract loaded:", contract);
+  
+      // Bind the button click events AFTER the contract loads
+      document.getElementById('submitButton').onclick = submitData;
+      document.getElementById('aggregateButton').onclick = aggregateData;
+    } else {
+      alert("Please install MetaMask to use this DApp!");
+    }
+  });
+  
 
-    document.getElementById('account').innerText = accounts[0];
-    console.log("Connected account:", accounts[0]);
-
-    const response = await fetch('Crowdsensing.json'); 
-    const contractData = await response.json();
-    const abi = contractData.abi;
-
-    contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
-    console.log("Contract loaded:", contract);
-  } else {
-    alert("Please install MetaMask to use this DApp!");
-  }
-});
-
-// Function to submit encrypted data
 async function submitData() {
   const dataInput = document.getElementById('dataInput').value;
   if (!dataInput) {
     alert("Please enter some data.");
     return;
   }
+
+  const encryptedData = encryptData(dataInput);
+  console.log("Encrypted Data:", encryptedData);
+
   try {
-    await contract.methods.submitData(dataInput).send({ from: accounts[0] });
+    await contract.methods.submitData(encryptedData).send({ from: accounts[0] });
     alert("Data submitted successfully!");
   } catch (error) {
     console.error("Error submitting data:", error);
@@ -39,19 +46,42 @@ async function submitData() {
   }
 }
 
-
 async function aggregateData() {
     try {
-      const providerAddresses = [
-        "0x01B0348d4DccAf44439ea692E2CE714281F9751d",
-        "0xB46507AB476c8c36381F05D5066E946848e1d476",
-        "0xA235564280960a0E55f1Fb53BF882E2e1174bF64"
-      ];
-      const receipt = await contract.methods.aggregateEncryptedData(providerAddresses)
-        .send({ from: accounts[0], gas: 5000000 });
-      console.log("Transaction receipt:", receipt);
+      // Ensure all accounts are defined
+      const providerAddresses = accounts.filter(account => !!account);
+      console.log("Provider Addresses:", providerAddresses);
+  
+      const validAddresses = [];
+  
+      // Validate that providers have submitted data
+      for (const address of providerAddresses) {
+        const providerData = await contract.methods.dataProviders(address).call();
+        if (providerData.encryptedData) {
+          validAddresses.push(address);
+        }
+      }
+  
+      if (validAddresses.length === 0) {
+        alert("No valid provider addresses with data.");
+        return;
+      }
+  
+      console.log("Valid Provider Addresses:", validAddresses);
+  
+      // Execute the aggregation transaction
+      const receipt = await contract.methods.aggregateEncryptedData(validAddresses).send({
+        from: accounts[0], // Owner account
+        gas: 6000000,      // Adjust gas limit as needed
+      });
+  
+      console.log("Transaction Receipt:", receipt);
+  
+      // Retrieve and display the aggregated result
       const aggregatedSum = await contract.methods.getEncryptedSum().call();
+      console.log("Aggregated Data:", aggregatedSum);
       document.getElementById('aggregatedData').innerText = `Aggregated Data: ${aggregatedSum}`;
+  
     } catch (error) {
       console.error("Error aggregating data:", error);
       alert("Failed to aggregate data.");
@@ -60,3 +90,10 @@ async function aggregateData() {
   
   
   
+  
+
+function encryptData(data) {
+  const encoder = new TextEncoder();
+  const encoded = encoder.encode(data);
+  return "0x" + Array.from(encoded).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
