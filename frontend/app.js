@@ -71,10 +71,6 @@ window.addEventListener('load', async () => {
 
   async function aggregateData() {
     try {
-      if (encryptedValues.length === 0) {
-        alert("No encrypted data available to aggregate.");
-        return;
-      }
   
       console.log("Encrypted Values to Aggregate:", encryptedValues);
   
@@ -85,9 +81,11 @@ window.addEventListener('load', async () => {
       });
   
       const result = await response.json();
-      console.log("Aggregation Result:", result.result);
+      console.log("Aggregation Result:", result);
   
-      document.getElementById('aggregatedData').innerText = `Aggregated Data: ${result.result}`;
+      document.getElementById('aggregatedData').innerText = 
+        `Encrypted Sum: ${result.encrypted_result}, Decrypted Sum: ${result.decrypted_result}`;
+  
     } catch (error) {
       console.error("Error aggregating data:", error);
       alert("Failed to aggregate data.");

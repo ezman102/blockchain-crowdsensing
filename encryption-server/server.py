@@ -48,7 +48,11 @@ def aggregate():
         decrypted_sum = private_key.decrypt(aggregated_encrypted)
         print(f"Decrypted Aggregated Sum: {decrypted_sum}")
 
-        return jsonify({'result': str(aggregated_encrypted.ciphertext())})
+        # Send both the ciphertext and decrypted result
+        return jsonify({
+            'encrypted_result': str(aggregated_encrypted.ciphertext()),
+            'decrypted_result': decrypted_sum
+        })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
