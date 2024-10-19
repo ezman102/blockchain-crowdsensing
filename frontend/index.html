@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crowdsensing DApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+  <h1>Crowdsensing DApp</h1>
+  <p>Connected account: <span id="account"></span></p>
+
+  <h3>Submit Data</h3>
+  <input type="text" id="dataInput" placeholder="Enter encrypted data" />
+  <button onclick="submitData()">Submit Data</button>
+
+  <h3>Aggregate Data</h3>
+  <button onclick="aggregateData()">Aggregate Data</button>
+  <p id="aggregatedData">Aggregated Data: None</p>
+
+  <script src="app.js"></script> <!-- Move script here -->
+</body>
+</html>
