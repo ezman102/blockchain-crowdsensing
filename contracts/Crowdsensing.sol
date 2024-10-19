@@ -25,10 +25,6 @@ contract Crowdsensing {
         _;
     }
 
-    function registerProvider(address provider) public onlyOwner {
-        dataProviders[provider] = DataProvider(provider, "", false);
-    }
-
     function submitData(string memory encryptedData) public {
         require(
             bytes(dataProviders[msg.sender].encryptedData).length == 0,
@@ -39,26 +35,49 @@ contract Crowdsensing {
         emit DataSubmitted(msg.sender, encryptedData);
     }
 
-function aggregateEncryptedData(address[] memory providerAddresses) public onlyOwner {
-    require(providerAddresses.length > 0, "No provider addresses provided");
-    
-    for (uint i = 0; i < providerAddresses.length; i++) {
-        address provider = providerAddresses[i];
-        require(bytes(dataProviders[provider].encryptedData).length != 0, "Data not submitted by provider");
-        
-        encryptedSum = string(abi.encodePacked(encryptedSum, dataProviders[provider].encryptedData));
+    function aggregateEncryptedData(
+        address[] memory providerAddresses
+    ) public onlyOwner {
+        require(providerAddresses.length > 0, "No provider addresses provided");
+
+        for (uint i = 0; i < providerAddresses.length; i++) {
+            address provider = providerAddresses[i];
+            require(
+                bytes(dataProviders[provider].encryptedData).length != 0,
+                "Data not submitted"
+            );
+
+            encryptedSum = string(
+                abi.encodePacked(
+                    encryptedSum,
+                    dataProviders[provider].encryptedData
+                )
+            );
+        }
+
+        emit AggregationComplete(encryptedSum);
     }
-    
-    emit AggregationComplete(encryptedSum);
-}
 
     // New function to reset provider data
     function resetProviderData(address provider) public onlyOwner {
-        require(bytes(dataProviders[provider].encryptedData).length != 0, "No data to reset");
+        require(
+            bytes(dataProviders[provider].encryptedData).length != 0,
+            "No data to reset"
+        );
         dataProviders[provider].encryptedData = "";
         dataCount--;
     }
-    
+
+    function registerProvider(address provider) public onlyOwner {
+        require(provider != address(0), "Invalid address");
+        require(
+            bytes(dataProviders[provider].encryptedData).length == 0,
+            "Provider already registered"
+        );
+
+        dataProviders[provider] = DataProvider(provider, "", false);
+    }
+
     function getEncryptedSum() public view returns (string memory) {
         return encryptedSum;
     }

@@ -1,4 +1,4 @@
-const CONTRACT_ADDRESS = "0x9a315221cB3aaB62E32d32b895ea9b1fE03FF675"; // Replace with actual contract address
+const CONTRACT_ADDRESS = "0xdFE2313B07519E5A898D76a837360e44c551420F"; // Replace with actual contract address
 let contract;
 let accounts;
 
@@ -27,61 +27,55 @@ window.addEventListener('load', async () => {
   });
   
 
-async function submitData() {
-  const dataInput = document.getElementById('dataInput').value;
-  if (!dataInput) {
-    alert("Please enter some data.");
-    return;
-  }
-
-  const encryptedData = encryptData(dataInput);
-  console.log("Encrypted Data:", encryptedData);
-
-  try {
-    await contract.methods.submitData(encryptedData).send({ from: accounts[0] });
-    alert("Data submitted successfully!");
-  } catch (error) {
-    console.error("Error submitting data:", error);
-    alert("Failed to submit data.");
-  }
-}
-
-async function aggregateData() {
-    try {
-      // Ensure all accounts are defined
-      const providerAddresses = accounts.filter(account => !!account);
-      console.log("Provider Addresses:", providerAddresses);
+  async function submitData() {
+    const dataInput = document.getElementById('dataInput').value;
+    if (!dataInput) {
+      alert("Please enter some data.");
+      return;
+    }
   
+    const encryptedData = encryptData(dataInput);
+    console.log("Encrypted Data:", encryptedData);
+  
+    try {
+      const providerData = await contract.methods.dataProviders(accounts[0]).call();
+      if (!providerData.provider) {
+        alert("You are not a registered provider.");
+        return;
+      }
+  
+      await contract.methods.submitData(encryptedData).send({ from: accounts[0] });
+      alert("Data submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      alert("Failed to submit data.");
+    }
+  }
+  
+  async function aggregateData() {
+    try {
       const validAddresses = [];
   
-      // Validate that providers have submitted data
-      for (const address of providerAddresses) {
-        const providerData = await contract.methods.dataProviders(address).call();
+      for (let i = 0; i < accounts.length; i++) {
+        const providerData = await contract.methods.dataProviders(accounts[i]).call();
         if (providerData.encryptedData) {
-          validAddresses.push(address);
+          validAddresses.push(accounts[i]);
         }
       }
   
       if (validAddresses.length === 0) {
-        alert("No valid provider addresses with data.");
+        alert("No valid provider data available for aggregation.");
         return;
       }
   
-      console.log("Valid Provider Addresses:", validAddresses);
-  
-      // Execute the aggregation transaction
-      const receipt = await contract.methods.aggregateEncryptedData(validAddresses).send({
-        from: accounts[0], // Owner account
-        gas: 6000000,      // Adjust gas limit as needed
+      await contract.methods.aggregateEncryptedData(validAddresses).send({
+        from: accounts[0], // Ensure this is the owner account
+        gas: 6000000,
       });
   
-      console.log("Transaction Receipt:", receipt);
-  
-      // Retrieve and display the aggregated result
       const aggregatedSum = await contract.methods.getEncryptedSum().call();
-      console.log("Aggregated Data:", aggregatedSum);
       document.getElementById('aggregatedData').innerText = `Aggregated Data: ${aggregatedSum}`;
-  
+      alert("Aggregation completed successfully!");
     } catch (error) {
       console.error("Error aggregating data:", error);
       alert("Failed to aggregate data.");
