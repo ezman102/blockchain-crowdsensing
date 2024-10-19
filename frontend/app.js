@@ -1,4 +1,4 @@
-const CONTRACT_ADDRESS = "0xdFE2313B07519E5A898D76a837360e44c551420F"; // Replace with actual contract address
+const CONTRACT_ADDRESS = "0xDB4cC017b9F06591A634926191f3297274c1fB9D"; // Replace with actual contract address
 let contract;
 let accounts;
 
@@ -29,20 +29,15 @@ window.addEventListener('load', async () => {
 
   async function submitData() {
     const dataInput = document.getElementById('dataInput').value;
-    if (!dataInput) {
-      alert("Please enter some data.");
+    
+    if (!dataInput || isNaN(dataInput)) {
+      alert("Please enter a valid numeric value.");
       return;
     }
   
-    const encryptedData = encryptData(dataInput);
-    console.log("Encrypted Data:", encryptedData);
-  
     try {
-      const providerData = await contract.methods.dataProviders(accounts[0]).call();
-      if (!providerData.provider) {
-        alert("You are not a registered provider.");
-        return;
-      }
+      const encryptedData = await encryptDataWithPython(dataInput);
+      console.log("Encrypted Data:", encryptedData);
   
       await contract.methods.submitData(encryptedData).send({ from: accounts[0] });
       alert("Data submitted successfully!");
@@ -51,6 +46,33 @@ window.addEventListener('load', async () => {
       alert("Failed to submit data.");
     }
   }
+  
+  
+  
+  async function encryptDataWithPython(data) {
+    try {
+      const response = await fetch(`http://localhost:5000/encrypt?value=${data}`);
+  
+      if (!response.ok) {
+        throw new Error('Encryption request failed');
+      }
+  
+      const result = await response.json();
+  
+      if (!result.encrypted) {
+        throw new Error('Invalid encryption result from backend');
+      }
+  
+      console.log("Encrypted Data:", result.encrypted);
+      return result.encrypted;  // Ensure this is returned as a string
+    } catch (error) {
+      console.error("Error encrypting data:", error);
+      throw error;
+    }
+  }
+  
+  
+  
   
   async function aggregateData() {
     try {
