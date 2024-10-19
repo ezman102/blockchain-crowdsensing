@@ -1,4 +1,4 @@
-const CONTRACT_ADDRESS = "0xDB4cC017b9F06591A634926191f3297274c1fB9D"; // Replace with actual contract address
+const CONTRACT_ADDRESS = "0x46e3DBe3b124A658fbcE2Bcc52025AbcE4EE4c25"; // Replace with actual contract address
 let contract;
 let accounts;
 
@@ -27,11 +27,28 @@ window.addEventListener('load', async () => {
   });
   
 
+  let encryptedValues = [];  // Store encrypted values globally
+
+  async function encryptDataWithPython(value) {
+    try {
+      const response = await fetch(`http://localhost:5000/encrypt?value=${value}`);
+      const result = await response.json();
+  
+      if (!result.ciphertext || result.exponent === undefined) {
+        throw new Error("Invalid encryption result from backend");
+      }
+  
+      return result;
+    } catch (error) {
+      console.error("Error encrypting data:", error);
+      throw error;
+    }
+  }
+  
   async function submitData() {
     const dataInput = document.getElementById('dataInput').value;
-    
-    if (!dataInput || isNaN(dataInput)) {
-      alert("Please enter a valid numeric value.");
+    if (!dataInput) {
+      alert("Please enter some data.");
       return;
     }
   
@@ -39,7 +56,10 @@ window.addEventListener('load', async () => {
       const encryptedData = await encryptDataWithPython(dataInput);
       console.log("Encrypted Data:", encryptedData);
   
-      await contract.methods.submitData(encryptedData).send({ from: accounts[0] });
+      // Store encrypted value in global array for aggregation
+      encryptedValues.push(encryptedData);
+  
+      await contract.methods.submitData(JSON.stringify(encryptedData)).send({ from: accounts[0] });
       alert("Data submitted successfully!");
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -48,61 +68,35 @@ window.addEventListener('load', async () => {
   }
   
   
-  
-  async function encryptDataWithPython(data) {
-    try {
-      const response = await fetch(`http://localhost:5000/encrypt?value=${data}`);
-  
-      if (!response.ok) {
-        throw new Error('Encryption request failed');
-      }
-  
-      const result = await response.json();
-  
-      if (!result.encrypted) {
-        throw new Error('Invalid encryption result from backend');
-      }
-  
-      console.log("Encrypted Data:", result.encrypted);
-      return result.encrypted;  // Ensure this is returned as a string
-    } catch (error) {
-      console.error("Error encrypting data:", error);
-      throw error;
-    }
-  }
-  
-  
-  
-  
+
   async function aggregateData() {
     try {
-      const validAddresses = [];
-  
-      for (let i = 0; i < accounts.length; i++) {
-        const providerData = await contract.methods.dataProviders(accounts[i]).call();
-        if (providerData.encryptedData) {
-          validAddresses.push(accounts[i]);
-        }
-      }
-  
-      if (validAddresses.length === 0) {
-        alert("No valid provider data available for aggregation.");
+      if (encryptedValues.length === 0) {
+        alert("No encrypted data available to aggregate.");
         return;
       }
   
-      await contract.methods.aggregateEncryptedData(validAddresses).send({
-        from: accounts[0], // Ensure this is the owner account
-        gas: 6000000,
+      console.log("Encrypted Values to Aggregate:", encryptedValues);
+  
+      const response = await fetch('http://localhost:5000/aggregate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ encrypted_values: encryptedValues })  // Use real encrypted values
       });
   
-      const aggregatedSum = await contract.methods.getEncryptedSum().call();
-      document.getElementById('aggregatedData').innerText = `Aggregated Data: ${aggregatedSum}`;
-      alert("Aggregation completed successfully!");
+      const result = await response.json();
+      console.log("Aggregation Result:", result.result);
+  
+      document.getElementById('aggregatedData').innerText = `Aggregated Data: ${result.result}`;
     } catch (error) {
       console.error("Error aggregating data:", error);
       alert("Failed to aggregate data.");
     }
   }
+  
+  
+  
+  
   
   
   

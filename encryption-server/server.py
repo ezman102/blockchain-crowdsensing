@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS from flask_cors
+from flask_cors import CORS
 from phe import paillier
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
 
 # Generate Paillier key pair for encryption
 public_key, private_key = paillier.generate_paillier_keypair()
@@ -11,18 +11,42 @@ public_key, private_key = paillier.generate_paillier_keypair()
 @app.route('/encrypt', methods=['GET'])
 def encrypt():
     try:
-        # Ensure value is a valid integer
         value = int(request.args.get('value'))
-        
-        # Encrypt the value using Paillier encryption
         encrypted_value = public_key.encrypt(value)
-        
-        # Return the encrypted value as a string
-        return jsonify({'encrypted': str(encrypted_value.ciphertext())})
+        return jsonify({
+            'ciphertext': str(encrypted_value.ciphertext()),
+            'exponent': encrypted_value.exponent
+        })
     except ValueError:
-        return jsonify({'error': 'Invalid input. Please provide a numeric value.'}), 400
+        return jsonify({'error': 'Invalid input. Provide a numeric value.'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/aggregate', methods=['POST'])
+def aggregate():
+    try:
+        data = request.get_json()
+        if 'encrypted_values' not in data:
+            return jsonify({'error': "'encrypted_values' key missing in request"}), 400
+
+        # Parse the encrypted values
+        encrypted_values = data['encrypted_values']
+        decrypted_sum = 0  # Aggregate decrypted sum (if needed for testing)
+
+        # Aggregate ciphertexts using real encrypted values
+        sum_ciphertext = 0
+        for val in encrypted_values:
+            encrypted_number = paillier.EncryptedNumber(public_key, int(val['ciphertext']), int(val['exponent']))
+            decrypted_sum += private_key.decrypt(encrypted_number)
+            sum_ciphertext += encrypted_number.ciphertext()
+
+        print(f"Decrypted Aggregated Sum: {decrypted_sum}")
+        return jsonify({'result': str(sum_ciphertext)})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(port=5000)
