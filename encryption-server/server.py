@@ -22,7 +22,6 @@ def encrypt():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/aggregate', methods=['POST'])
 def aggregate():
     try:
@@ -30,23 +29,29 @@ def aggregate():
         if 'encrypted_values' not in data:
             return jsonify({'error': "'encrypted_values' key missing in request"}), 400
 
-        # Parse the encrypted values
         encrypted_values = data['encrypted_values']
-        decrypted_sum = 0  # Aggregate decrypted sum (if needed for testing)
 
-        # Aggregate ciphertexts using real encrypted values
-        sum_ciphertext = 0
+        # Reconstruct EncryptedNumber objects from the received data
+        aggregated_encrypted = None
         for val in encrypted_values:
-            encrypted_number = paillier.EncryptedNumber(public_key, int(val['ciphertext']), int(val['exponent']))
-            decrypted_sum += private_key.decrypt(encrypted_number)
-            sum_ciphertext += encrypted_number.ciphertext()
+            encrypted_number = paillier.EncryptedNumber(
+                public_key, 
+                int(val['ciphertext']), 
+                int(val['exponent'])
+            )
+            if aggregated_encrypted is None:
+                aggregated_encrypted = encrypted_number
+            else:
+                aggregated_encrypted += encrypted_number
 
+        # Optionally decrypt the aggregated result for testing
+        decrypted_sum = private_key.decrypt(aggregated_encrypted)
         print(f"Decrypted Aggregated Sum: {decrypted_sum}")
-        return jsonify({'result': str(sum_ciphertext)})
+
+        return jsonify({'result': str(aggregated_encrypted.ciphertext())})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(port=5000)
