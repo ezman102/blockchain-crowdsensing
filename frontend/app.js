@@ -39,28 +39,24 @@ async function submitData() {
   }
 }
 
-// Function to aggregate data
-// Function to aggregate data
+
 async function aggregateData() {
     try {
-      // Fetch all data providers (you may need to define them or get them dynamically)
       const providerAddresses = [
-        "0x01B0348d4DccAf44439ea692E2CE714281F9751d", // Example address 1
-        "0xB46507AB476c8c36381F05D5066E946848e1d476", // Example address 2
-        "0xA235564280960a0E55f1Fb53BF882E2e1174bF64"  // Example address 3
-      ]; 
-  
-      // Call aggregateEncryptedData with provider addresses
-      await contract.methods.aggregateEncryptedData(providerAddresses).send({ from: accounts[0] });
-  
-      // Fetch the aggregated encrypted sum from the contract
+        "0x01B0348d4DccAf44439ea692E2CE714281F9751d",
+        "0xB46507AB476c8c36381F05D5066E946848e1d476",
+        "0xA235564280960a0E55f1Fb53BF882E2e1174bF64"
+      ];
+      const receipt = await contract.methods.aggregateEncryptedData(providerAddresses)
+        .send({ from: accounts[0], gas: 5000000 });
+      console.log("Transaction receipt:", receipt);
       const aggregatedSum = await contract.methods.getEncryptedSum().call();
-  
-      // Display the result in the frontend
       document.getElementById('aggregatedData').innerText = `Aggregated Data: ${aggregatedSum}`;
     } catch (error) {
       console.error("Error aggregating data:", error);
       alert("Failed to aggregate data.");
     }
   }
+  
+  
   

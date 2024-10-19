@@ -48,17 +48,4 @@ contract Crowdsensing {
     function getEncryptedSum() public view returns (string memory) {
         return encryptedSum;
     }
-
-    function getAllProviders() public view returns (address[] memory) {
-    address[] memory providers = new address[](dataCount);
-    uint index = 0;
-    for (uint i = 0; i < dataCount; i++) {
-        if (dataProviders[i].provider != address(0)) {
-            providers[index] = dataProviders[i].provider;
-            index++;
-        }
-    }
-    return providers;
-}
-
 }
