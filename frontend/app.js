@@ -1,4 +1,4 @@
-const CONTRACT_ADDRESS = "0xd7Ba84031cf1A2d252c84b858dA2955e0219d39F"; // Replace with actual contract address
+const CONTRACT_ADDRESS = "0x9a315221cB3aaB62E32d32b895ea9b1fE03FF675"; // Replace with actual contract address
 let contract;
 let accounts;
 
@@ -90,6 +90,17 @@ async function aggregateData() {
   
   
   
+  document.getElementById('resetButton').onclick = async () => {
+    try {
+      const providerAddress = accounts[0]; // Example: Reset data for the current account
+      await contract.methods.resetProviderData(providerAddress).send({ from: accounts[0] });
+  
+      alert(`Data for ${providerAddress} has been reset!`);
+    } catch (error) {
+      console.error("Error resetting data:", error);
+      alert("Failed to reset data.");
+    }
+  };
   
 
 function encryptData(data) {

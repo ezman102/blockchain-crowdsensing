@@ -52,7 +52,13 @@ function aggregateEncryptedData(address[] memory providerAddresses) public onlyO
     emit AggregationComplete(encryptedSum);
 }
 
-
+    // New function to reset provider data
+    function resetProviderData(address provider) public onlyOwner {
+        require(bytes(dataProviders[provider].encryptedData).length != 0, "No data to reset");
+        dataProviders[provider].encryptedData = "";
+        dataCount--;
+    }
+    
     function getEncryptedSum() public view returns (string memory) {
         return encryptedSum;
     }
