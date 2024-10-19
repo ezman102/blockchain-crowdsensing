@@ -5,7 +5,7 @@ from phe import paillier
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
 
-# Generate Paillier key pair for encryption
+# Generate Paillier public and private key pair
 public_key, private_key = paillier.generate_paillier_keypair()
 
 @app.route('/encrypt', methods=['GET'])
@@ -26,31 +26,22 @@ def encrypt():
 def aggregate():
     try:
         data = request.get_json()
-        if 'encrypted_values' not in data:
-            return jsonify({'error': "'encrypted_values' key missing in request"}), 400
-
         encrypted_values = data['encrypted_values']
 
-        # Reconstruct EncryptedNumber objects from the received data
-        aggregated_encrypted = None
-        for val in encrypted_values:
-            encrypted_number = paillier.EncryptedNumber(
-                public_key, 
-                int(val['ciphertext']), 
-                int(val['exponent'])
-            )
-            if aggregated_encrypted is None:
-                aggregated_encrypted = encrypted_number
-            else:
-                aggregated_encrypted += encrypted_number
+        # Convert to EncryptedNumber objects
+        encrypted_numbers = [
+            paillier.EncryptedNumber(public_key, int(val['ciphertext']), val['exponent'])
+            for val in encrypted_values
+        ]
 
-        # Optionally decrypt the aggregated result for testing
-        decrypted_sum = private_key.decrypt(aggregated_encrypted)
-        print(f"Decrypted Aggregated Sum: {decrypted_sum}")
+        # Aggregate the encrypted values (Sum)
+        encrypted_sum = sum(encrypted_numbers)
 
-        # Send both the ciphertext and decrypted result
+        # Decrypt the aggregated sum
+        decrypted_sum = private_key.decrypt(encrypted_sum)
+
         return jsonify({
-            'encrypted_result': str(aggregated_encrypted.ciphertext()),
+            'encrypted_result': str(encrypted_sum.ciphertext()),
             'decrypted_result': decrypted_sum
         })
 
