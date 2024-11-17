@@ -18,7 +18,7 @@ window.addEventListener('load', async () => {
             const contractData = await response.json();
             const abi = contractData.abi;
 
-            const CONTRACT_ADDRESS = "0x6eD79Aa1c71FD7BdBC515EfdA3Bd4e26394435cC"; 
+            const CONTRACT_ADDRESS = "0xA98e3Bb90498C1949885583897b8a2dDB0503017"; 
             contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 
             console.log("Contract loaded:", contract);
@@ -73,11 +73,17 @@ async function aggregateData() {
         const result = await response.json();
         console.log("Aggregation Result:", result);
 
-        document.getElementById('aggregatedData').innerText = 
-        `Encrypted Sum: ${result.encrypted_result}, 
-         Decrypted Sum: ${result.decrypted_result}, 
-         Noisy Sum: ${result.noisy_result}`;
-      
+        const { encrypted_result, decrypted_result, noisy_result } = result;
+
+        // Format the display with better readability
+        const formattedEncryptedSum = encrypted_result.length > 100 
+            ? `${encrypted_result.substring(0, 100)}...`
+            : encrypted_result;
+
+        document.getElementById('aggregatedData').innerText =
+            `Encrypted Sum: ${formattedEncryptedSum}\n` +
+            `Decrypted Sum: ${decrypted_result}\n` +
+            `Noisy Sum: ${noisy_result}`;
 
     } catch (error) {
         console.error("Error aggregating data:", error);

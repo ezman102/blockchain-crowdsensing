@@ -11,11 +11,11 @@
 
   <style>
     body {
-      background-color: #f5f5f5;
+      background-color: #f0f8ff;
     }
     .container {
       margin-top: 50px;
-      max-width: 1500px;
+      max-width: 1000px;
       padding: 30px;
       background-color: white;
       border-radius: 10px;
@@ -24,9 +24,11 @@
     h1 {
       text-align: center;
       margin-bottom: 30px;
+      color: #007bff;
     }
     .btn {
       width: 100%;
+      margin-top: 10px;
     }
     .footer {
       margin-top: 20px;
@@ -41,31 +43,50 @@
       list-style-type: none;
       margin-bottom: 10px;
       padding: 10px;
-      background-color: #f8f9fa;
+      background-color: #e9ecef;
       border: 1px solid #dee2e6;
       border-radius: 5px;
     }
+    .long-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    border-radius: 5px;
+  }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Crowdsensing DApp</h1>
 
-    <p class="text-center"><strong>Connected Account:</strong> <span id="account">Not Connected</span></p>
+    <p class="text-center">
+      <strong>Connected Account:</strong> <span id="account">Not Connected</span>
+    </p>
 
-    <h2 class="mt-4">Submit Data</h2>
-    <input type="text" id="dataInput" class="form-control mb-3" placeholder="Enter encrypted data">
-    <button id="submitButton" class="btn btn-primary mb-3">Submit Data</button>
+    <h2 class="mt-4">Submit Carbon Emission Data</h2>
+    <div class="input-group mb-3">
+      <input type="number" id="dataInput" class="form-control" placeholder="Enter Carbon Emission (g)" min="0" max="50">
+      <span class="input-group-text">g</span>
+    </div>
+    <button id="submitButton" class="btn btn-primary">Submit Carbon Emission</button>
 
-    <h2 class="mt-4">Aggregated Data</h2>
+    <h2 class="mt-4">Aggregated Carbon Emission Data</h2>
     <button id="aggregateButton" class="btn btn-success mb-3">Aggregate Data</button>
-    <p id="aggregatedData" class="text-muted">Aggregated Data: </p>
-    <h2 class="mt-4">Transactions</h2>
-    <button id="loadTransactionsButton" class="btn btn-secondary mb-3">Load Transactions</button>
-    <ul id="transactionList" class="list-group"></ul>
-    <ul id="transactions" class="list-group mt-4"></ul>
+    <div id="aggregatedData" class="long-text">
+      Aggregated Data: Waiting for submission...
+    </div>
     
     
+
+
+    <h2 class="mt-4">Transaction History</h2>
+    <button id="loadTransactionsButton" class="btn btn-secondary">Load Transactions</button>
+    <ul id="transactions" class="list-group mt-3"></ul>
   </div>
 
   <div class="footer">
