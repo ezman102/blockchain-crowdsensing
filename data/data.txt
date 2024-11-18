@@ -1,3 +1,0 @@
-Temperature: 25°C, Humidity: 60%, Location: New York
-Temperature: 27°C, Humidity: 65%, Location: Los Angeles
-Temperature: 30°C, Humidity: 50%, Location: Miami
