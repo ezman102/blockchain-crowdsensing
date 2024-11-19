@@ -19,7 +19,7 @@ window.addEventListener('load', async () => {
             const contractData = await response.json();
             const abi = contractData.abi;
 
-            const CONTRACT_ADDRESS = "0xa6b7b8B4578f6d17a765d9026a7f303Af35FF342"; 
+            const CONTRACT_ADDRESS = "0xEd0303e37Fb7105A576C034DD576f4871F7fA410"; 
             contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 
             console.log("Contract loaded:", contract);
