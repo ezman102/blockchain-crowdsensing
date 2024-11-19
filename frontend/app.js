@@ -1,3 +1,4 @@
+//app.js
 let web3;
 let contract;
 let accounts;
@@ -139,6 +140,7 @@ async function loadTransactions() {
   }
 }
 
+document.getElementById('zkpButton').onclick = verifyDataWithZKP;
 
 
 // Helper function to get all provider addresses
@@ -169,5 +171,31 @@ async function encryptDataWithPython(value) {
     } catch (error) {
         console.error("Error encrypting data:", error);
         throw error;
+    }
+}
+
+async function verifyDataWithZKP() {
+    const dataInput = document.getElementById('dataInput').value;
+    if (!dataInput) {
+        alert("Please enter some data.");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:5000/zkp_verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: parseInt(dataInput) })
+        });
+
+        const result = await response.json();
+        if (result.verified) {
+            document.getElementById('zkpResult').innerText = "ZKP Verification: Valid data!";
+        } else {
+            document.getElementById('zkpResult').innerText = "ZKP Verification: Invalid data!";
+        }
+    } catch (error) {
+        console.error("Error verifying data with ZKP:", error);
+        alert("Failed to verify data with ZKP.");
     }
 }
