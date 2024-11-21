@@ -5,17 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3bbcfb82-cc11-4d9b-ba02-49e263c64142" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/contracts/Crowdsensing.json" beforeDir="false" afterPath="$PROJECT_DIR$/build/contracts/Crowdsensing.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/data.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/encryption-server/paillier_encryption.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/Crowdsensing.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Groth16Verifier.json" beforeDir="false" afterPath="$PROJECT_DIR$/build/contracts/Groth16Verifier.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Migrations.json" beforeDir="false" afterPath="$PROJECT_DIR$/build/contracts/Migrations.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/contracts/Crowdsensing.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/Crowdsensing.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/encryption-server.py" beforeDir="false" afterPath="$PROJECT_DIR$/encryption-server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/aggregate_data.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/check_submissions.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/read_data.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/register_providers.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/submit_data.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/crowdsensing_test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input.json" beforeDir="false" afterPath="$PROJECT_DIR$/input.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proof.json" beforeDir="false" afterPath="$PROJECT_DIR$/proof.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public.json" beforeDir="false" afterPath="$PROJECT_DIR$/public.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/witness.wtns" beforeDir="false" afterPath="$PROJECT_DIR$/witness.wtns" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,10 +26,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2p19wHT6LjEvWeDQ7GO5Hcy4XYS" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -38,7 +39,7 @@
   "keyToString": {
     "Python.paillier_encryption.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "zkp-circuit",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -62,6 +63,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/encryption-server/paillier_encryption.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -80,7 +82,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23726.96" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102" />
+        <option value="bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102" />
       </set>
     </attachedChunks>
   </component>
@@ -93,6 +96,7 @@
       <option name="presentableId" value="Default" />
       <updated>1731922952719</updated>
       <workItem from="1731922954444" duration="680000" />
+      <workItem from="1732201372486" duration="509000" />
     </task>
     <servers />
   </component>

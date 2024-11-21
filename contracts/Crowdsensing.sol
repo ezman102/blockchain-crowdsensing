@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Crowdsensing.sol
 pragma solidity ^0.8.0;
 
 contract Crowdsensing {
@@ -11,7 +12,7 @@ contract Crowdsensing {
     address public owner;
     mapping(address => DataProvider) public dataProviders;
     uint public dataCount;
-    string public lastAggregatedSum;  // Store last aggregated sum
+    string public lastAggregatedSum;  
 
     event DataSubmitted(address indexed provider, string encryptedData);
     event AggregationComplete(string encryptedSum);

@@ -2,7 +2,7 @@
 let web3;
 let contract;
 let accounts;
-let encryptedValues = []; // Initialize encryptedValues array globally
+let encryptedValues = []; 
 
 window.addEventListener('load', async () => {
     if (window.ethereum) {
@@ -15,11 +15,11 @@ window.addEventListener('load', async () => {
             document.getElementById('account').innerText = accounts[0];
             console.log("Connected account:", accounts[0]);
 
-            const response = await fetch('Crowdsensing.json');
+            const response = await fetch('../build/contracts/Crowdsensing.json');
             const contractData = await response.json();
             const abi = contractData.abi;
 
-            const CONTRACT_ADDRESS = "0xEd0303e37Fb7105A576C034DD576f4871F7fA410"; 
+            const CONTRACT_ADDRESS = "0x1339F76eC0Eb94005d5DfB0FaDBDeb5FF549e358"; 
             contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 
             console.log("Contract loaded:", contract);
@@ -27,7 +27,9 @@ window.addEventListener('load', async () => {
             // Bind the button events AFTER the contract and functions are defined
             document.getElementById('submitButton').onclick = submitData;
             document.getElementById('aggregateButton').onclick = aggregateData;
+            document.getElementById('aggregateWithDPButton').onclick = aggregateDataWithDP; 
             document.getElementById('loadTransactionsButton').onclick = loadTransactions;
+            document.getElementById('zkpButton').onclick = verifyDataWithZKP;
 
         } catch (error) {
             console.error("Error connecting to MetaMask:", error);
@@ -92,6 +94,39 @@ async function aggregateData() {
     }
 }
 
+// Aggregate data with differential privacy
+async function aggregateDataWithDP() {
+    try {
+        console.log("Encrypted Values for Differential Privacy Aggregation:", encryptedValues);
+
+        // Send encrypted values to the backend for aggregation with DP
+        const response = await fetch('http://localhost:5000/aggregate_with_dp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ encrypted_values: encryptedValues })
+        });
+
+        const result = await response.json();
+        console.log("Differential Privacy Aggregation Result:", result);
+
+        const { aggregated_result, dp_results } = result;
+
+        // Build the DP results display
+        let dpResultString = `Aggregated Result (True Sum): ${aggregated_result}\n\nDifferential Privacy Results:\n`;
+        dp_results.forEach((dpResult) => {
+            dpResultString += `Epsilon: ${dpResult.epsilon}, Noisy Result: ${dpResult.noisy_result}, Noise Difference: ${dpResult.noise_diff_percent.toFixed(2)}%\n`;
+        });
+
+        // Display the results in the frontend
+        document.getElementById('aggregatedDataWithDP').innerText = dpResultString;
+
+    } catch (error) {
+        console.error("Error in DP Aggregation:", error);
+        alert("Failed to aggregate data with differential privacy.");
+    }
+}
+
+// Load transaction
 async function loadTransactions() {
   try {
       const latestBlock = await web3.eth.getBlockNumber();
@@ -140,7 +175,7 @@ async function loadTransactions() {
   }
 }
 
-document.getElementById('zkpButton').onclick = verifyDataWithZKP;
+
 
 
 // Helper function to get all provider addresses
