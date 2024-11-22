@@ -2,5 +2,5 @@
 const Crowdsensing = artifacts.require("Crowdsensing");
 
 module.exports = function (deployer) {
-    deployer.deploy(Crowdsensing, { gas: 6721975 });
+    deployer.deploy(Crowdsensing);
 };
