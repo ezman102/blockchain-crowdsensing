@@ -22,6 +22,7 @@ Prerequisites
     Ganache: Install Ganache for a local Ethereum blockchain.
     Python 3.8+: Required for the backend server.
     Flask: Install with pip install flask flask-cors phe diffprivlib.
+    MetaMask: Install the MetaMask browser extension from MetaMask Official Website.
 
 Setup and Running Instructions
 
@@ -31,6 +32,8 @@ Step 1: Smart Contract Deployment
     In the project root directory, compile and deploy the contracts:
 
     truffle migrate --reset
+
+    After deploying the smart contract, update the contract address in app.js.
 
 Step 2: Backend Encryption Server
 
@@ -45,6 +48,14 @@ Step 3: Frontend DApp
     python -m http.server 8000
 
     Open your browser and navigate to http://localhost:8000.
+
+Step 4: MetaMask Integration
+
+    Ensure the MetaMask extension is installed in your browser.
+
+    Connect MetaMask to your Ganache local blockchain network.
+
+    Import an account from Ganache by using the private key of one of the accounts provided in Ganache.
 
 
 Future Improvements

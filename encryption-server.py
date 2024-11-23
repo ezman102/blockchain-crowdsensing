@@ -12,15 +12,6 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 BASE_DIR = os.path.abspath(os.getcwd())  
 
-@app.before_request
-def handle_options_requests():
-    if request.method == 'OPTIONS':
-        response = app.make_default_options_response()
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-        return response
-
 # Generate Paillier public and private key pair
 public_key, private_key = paillier.generate_paillier_keypair()
 
@@ -100,7 +91,6 @@ def aggregate_with_dp():
         encrypted_values = data['encrypted_values']
         epsilon_values = data.get('epsilon_values', [0.5, 1.0, 2.0])  # Default epsilon values to test
 
-        # Decrypt and aggregate data
         encrypted_numbers = [
             paillier.EncryptedNumber(public_key, int(val['ciphertext']), val['exponent'])
             for val in encrypted_values

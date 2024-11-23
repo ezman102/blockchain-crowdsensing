@@ -18,13 +18,13 @@ window.addEventListener('load', async () => {
             const response = await fetch('../build/contracts/Crowdsensing.json');
             const contractData = await response.json();
             const abi = contractData.abi;
-
-            const CONTRACT_ADDRESS = "0x1339F76eC0Eb94005d5DfB0FaDBDeb5FF549e358"; 
+            
+            // Update the contract address below whenever the smart contract is redeployed
+            const CONTRACT_ADDRESS = "0x76d0E5265FEA415982dcB2d8Af24d956286eBDFd"; 
             contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 
             console.log("Contract loaded:", contract);
 
-            // Bind the button events AFTER the contract and functions are defined
             document.getElementById('submitButton').onclick = submitData;
             document.getElementById('aggregateButton').onclick = aggregateData;
             document.getElementById('aggregateWithDPButton').onclick = aggregateDataWithDP; 
@@ -52,7 +52,7 @@ async function submitData() {
         const encryptedData = await encryptDataWithPython(dataInput);
         console.log("Encrypted Data:", encryptedData);
 
-        encryptedValues.push(encryptedData); // Store encrypted data globally
+        encryptedValues.push(encryptedData); 
 
         await contract.methods.submitData(JSON.stringify(encryptedData)).send({ from: accounts[0] });
         alert("Data submitted successfully!");
@@ -111,13 +111,11 @@ async function aggregateDataWithDP() {
 
         const { aggregated_result, dp_results } = result;
 
-        // Build the DP results display
         let dpResultString = `Aggregated Result (True Sum): ${aggregated_result}\n\nDifferential Privacy Results:\n`;
         dp_results.forEach((dpResult) => {
             dpResultString += `Epsilon: ${dpResult.epsilon}, Noisy Result: ${dpResult.noisy_result}, Noise Difference: ${dpResult.noise_diff_percent.toFixed(2)}%\n`;
         });
 
-        // Display the results in the frontend
         document.getElementById('aggregatedDataWithDP').innerText = dpResultString;
 
     } catch (error) {
@@ -153,7 +151,7 @@ async function loadTransactions() {
           return;
       }
 
-      txList.innerHTML = ""; // Clear previous transactions if any
+      txList.innerHTML = ""; 
 
       for (const address of providerAddresses) {
           const providerTransactions = events.filter(event => event.returnValues.provider === address);
@@ -174,9 +172,6 @@ async function loadTransactions() {
       alert("Failed to load transactions.");
   }
 }
-
-
-
 
 // Helper function to get all provider addresses
 async function getAllProviderAddresses() {
@@ -208,7 +203,7 @@ async function encryptDataWithPython(value) {
         throw error;
     }
 }
-
+// Function to verify Data With ZKP
 async function verifyDataWithZKP() {
     const dataInput = document.getElementById('dataInput').value;
     if (!dataInput) {
