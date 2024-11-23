@@ -1,9 +1,0 @@
-enclave {
-    trusted {
-        public void hello_world();
-    };
-
-    untrusted {
-        void ocall_print([in, string] const char *message);
-    };
-};

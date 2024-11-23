@@ -112,6 +112,5 @@ contract Crowdsensing {
         return lastAggregatedSum;
     }
 
-    // Fallback function to accept Ether
     receive() external payable {}
 }

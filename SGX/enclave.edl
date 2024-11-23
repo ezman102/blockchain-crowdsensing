@@ -1,9 +1,0 @@
-enclave {
-    trusted {
-        public void verify_zkp([in, size=data_size] uint8_t *data, size_t data_size);
-    };
-
-    untrusted {
-        void log_message([in] const char *message);
-    };
-};
