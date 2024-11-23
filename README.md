@@ -4,17 +4,6 @@ Overview
 This project is a blockchain-based decentralized application (DApp) designed for secure crowdsensing with data aggregation, encryption, and differential privacy features. The application leverages Ethereum smart contracts, Paillier encryption, differential privacy, and SGX (future improvement) for data security and trust.
 Directory Structure
 
-.
-├── contracts/                  # Solidity smart contracts
-├── migrations/                 # Migration scripts for deploying contracts
-├── build/contracts/            # Compiled contract artifacts
-├── SGX/                        # SGX integration (future improvement)
-├── zkp_circuit_js/             # Zero-Knowledge Proof (ZKP) implementation
-├── encryption-server.py        # Python backend for encryption and aggregation
-├── app.js                      # Frontend DApp logic (JavaScript)
-├── index.html                  # Frontend UI for the DApp
-└── node_modules/               # Dependencies for Truffle and frontend
-
 Prerequisites
 
     Node.js: Install from Node.js Official Website.
@@ -63,3 +52,5 @@ Future Improvements
     SGX Integration: Secure computation within Intel SGX enclaves.
     Enhanced ZKP: Advanced zero-knowledge proof circuits for added data security.
     Deployment: Deployment to a public Ethereum testnet or mainnet.
+
+    Github:
